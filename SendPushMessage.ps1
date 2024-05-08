@@ -28,12 +28,66 @@ $macosbody = "{`n  `"MessageBody`": `"TEST - Action Needed - Subscription Expira
 
 #-----------------------------------------------------------[Functions]------------------------------------------------------------
 
+Function Write-Log {
+  [CmdletBinding()]
+
+     Param (
+         [Parameter(
+             Mandatory=$true,
+             ValueFromPipeline=$true,
+             Position=0)]
+         [ValidateNotNullorEmpty()]
+         [String]$Message,
+
+       [Parameter(Position=1)]
+         [ValidateSet("Information","Warning","Error","Debug","Verbose")]
+         [String]$Level = 'Information',
+
+         [String]$Path = [IO.Path]::GetTempPath()
+        
+     )
+
+     Process {
+         $DateFormat = "%m/%d/%Y %H:%M:%S"
+
+         If (-Not $NoHost) {
+           Switch ($Level) {
+             "information" {
+               Write-Host ("[{0}] {1}" -F (Get-Date -UFormat $DateFormat), $Message)
+               Break
+             }
+             "warning" {
+               Write-Warning ("[{0}] {1}" -F (Get-Date -UFormat $DateFormat), $Message)
+               Break
+             }
+             "error" {
+               Write-Error ("[{0}] {1}" -F (Get-Date -UFormat $DateFormat), $Message)
+               Break
+             }
+             "debug" {
+               Write-Debug ("[{0}] {1}" -F (Get-Date -UFormat $DateFormat), $Message) -Debug:$true
+               Break
+             }
+             "verbose" {
+               Write-Verbose ("[{0}] {1}" -F (Get-Date -UFormat $DateFormat), $Message) -Verbose:$true
+               Break
+             }
+           }
+         }
+
+        Add-Content -Path (Join-Path $Path 'log.txt') -Value ("[{0}] ({1}) {2}" -F (Get-Date -UFormat $DateFormat), $Level, $Message)
+
+        
+     }
+ }
+
+
 Function SearchandMessageDevices() {
 
 
 if ([string]::IsNullOrEmpty($wsoserver))
   {
-    $script:WSOServer = Read-Host -Prompt 'Enter the Workspace ONE UEM Server Name'
+    $script:WSOServer = Read-Host -Prompt 'Enter the Workspace ONE UEM API Server Name'
   
   }
  if ([string]::IsNullOrEmpty($header))
@@ -56,6 +110,9 @@ if ([string]::IsNullOrEmpty($wsoserver))
     "Accept"		 = "application/json;version=2";
     "Content-Type"   = "application/json";}
   }
+
+  Write-Log "Second Message" -Level "Warning"
+
 
 
 
