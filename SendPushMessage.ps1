@@ -132,7 +132,7 @@ if ([string]::IsNullOrEmpty($wsoserver))
 
  {
 
-  $devicetype = $os
+$devicetype = $os
 
  $platform = switch ($devicetype)
   {
@@ -143,7 +143,7 @@ if ([string]::IsNullOrEmpty($wsoserver))
   
   }
 
-write-log "Processing: " $devicetype -Level Information
+write-log "Processing: $devicetype" -Level Information
 
 try {
     
@@ -184,11 +184,15 @@ foreach ($deviceid in $sresult.devices.id.value)
   }
 
 
-Write-Log $sresult.total "$devicetype devices found" -Level Information
+$itotal = ""
+
+$itotal = $sresult.Total
+
+Write-Log "$itotal $devicetype devices found" -Level Information
 
 $finalpage = [Math]::Ceiling($sresult.total / 10) 
 
-Write-Log "Final Page $finalpage" -Level Information
+Write-Log "Final Page:  $finalpage" -Level Information
 
 if ($finalpage -eq 1)
 
@@ -196,10 +200,10 @@ if ($finalpage -eq 1)
 
   switch ($devicetype)
   {
-    Windows {Write-Log $listWindows.count "Total Windows Devices" -Level Information}
-    MacOS {Write-Log $listmac.count "Total MacOS Devices" -Level Information}
-    iOS {Write-Log $listios.Count  "Total iOS Devices" -Level Information}
-    Android {Write-Log $listandroid.Count  "Total Android Devices" -Level Information}
+    Windows {Write-Log "Total Windows Devices: $($listWindows.Count)" -Level Information}
+    MacOS {write-log "Total MacOS Devices: $($listmac.Count)" -Level Information}
+    iOS {Write-Log "Total iOS Devices: $($listios.Count)" -Level Information}
+    Android {Write-Log "Total Android Devices: $($listandroid.Count)" -Level Information}
   
   }
  
@@ -219,7 +223,7 @@ if ($finalpage -eq 1)
 
         {
 
-          Write-Host "Message Sent Sucessfully to Windows Device ID $id"
+          Write-Log "Message Sent Sucessfully to Windows Device ID $id" -Level Information
 
         }
         
@@ -235,14 +239,14 @@ if ($finalpage -eq 1)
       {
         try {$response = Invoke-WebRequest -Method Post -Uri "https://$wsoserver/api/mdm/devices/messages/push?searchby=deviceid&id=$id" -ContentType "application/json" -Header $header -Body $macosbody}
 
-        catch {Write-Host "An error occurred when running script:  $_" }
+        catch {Write-Log "An error occurred when running script:  $_" -Level Error}
 
 
         if ($response.statuscode -eq 202)
 
         {
 
-          Write-Host "Message Sent Sucessfully to Device ID $id"
+          Write-Log "Message Sent Sucessfully to MacOS Device ID $id" -Level Information
 
         }
         
@@ -289,7 +293,7 @@ if ($finalpage -eq 1)
 
           {
 
-            Write-Host "Message Sent Sucessfully to Device ID $id"
+            Write-Log "Message Sent Sucessfully to Android Device ID $id" -Level Information
 
           }
           
