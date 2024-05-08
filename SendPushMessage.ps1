@@ -43,9 +43,9 @@ Function Write-Log {
          [ValidateSet("Information","Warning","Error","Debug","Verbose")]
          [String]$Level = 'Information',
 
-         [String]$Path = [IO.Path]::GetTempPath()
+         [String]$script:Path = [IO.Path]::GetTempPath()
         
-     )
+           )
 
      Process {
          $DateFormat = "%m/%d/%Y %H:%M:%S"
@@ -75,7 +75,13 @@ Function Write-Log {
            }
          }
 
-        Add-Content -Path (Join-Path $Path 'log.txt') -Value ("[{0}] ({1}) {2}" -F (Get-Date -UFormat $DateFormat), $Level, $Message)
+
+        $logDateFormat = "%m_%d_%Y"
+        $sdate = Get-Date -UFormat $logDateFormat
+
+        $script:logfilename = "uem-nofify-$sdate.log"
+       
+        Add-Content -Path (Join-Path $Path $logfilename) -Value ("[{0}] ({1}) {2}" -F (Get-Date -UFormat $DateFormat), $Level, $Message)
 
         
      }
@@ -111,9 +117,9 @@ if ([string]::IsNullOrEmpty($wsoserver))
     "Content-Type"   = "application/json";}
   }
 
-  Write-Log "Second Message" -Level "Warning"
-
-
+  Write-Log "Starting Script" -Level Information
+  Write-Log "Log file $script:path$script:logfilename" -Level Information
+  Write-Log "Searching $wsoserver" -Level Information
 
 
   $listdevices.add("Android")
@@ -137,18 +143,16 @@ if ([string]::IsNullOrEmpty($wsoserver))
   
   }
 
-write-host "Processing: " $devicetype
+write-log "Processing: " $devicetype -Level Information
 
 try {
     
   $sresult = Invoke-RestMethod -Method Get -Uri "https://$wsoserver/api/mdm/devices/search?platform=$platform&page=0&pagesize=10" -ContentType "application/json" -Header $header
 
-  #API/mdm/devices/search?platform=winrt&page=0&pagesize=50
-
 }
 
 catch {
-  Write-Host "An error occurred when running script:  $_"
+  Write-Log "An error occurred when searching devices:  $_" -Level "Warning"
   break
 }
 
@@ -157,7 +161,7 @@ if ($sresult -eq "")
 
 {
 
-  write-host "No $devicetype devices found"
+  Write-Log "No $devicetype devices found" -Level Information
   continue
 
 }
@@ -167,7 +171,6 @@ foreach ($deviceid in $sresult.devices.id.value)
     {
 
     
-
   switch ($devicetype)
   
     {
@@ -181,11 +184,11 @@ foreach ($deviceid in $sresult.devices.id.value)
   }
 
 
-write-host $sresult.total "$devicetype devices found"
+Write-Log $sresult.total "$devicetype devices found" -Level Information
 
 $finalpage = [Math]::Ceiling($sresult.total / 10) 
 
-Write-Host "Final Page $finalpage"
+Write-Log "Final Page $finalpage" -Level Information
 
 if ($finalpage -eq 1)
 
@@ -193,10 +196,10 @@ if ($finalpage -eq 1)
 
   switch ($devicetype)
   {
-    Windows {write-host $listWindows.count "Windows Devices To Message"}
-    MacOS {write-host $listmac.count "MacOS Devices To Message"}
-    iOS {write-host $listios.Count  "iOS Devices To Message"}
-    Android {write-host $listandroid.Count  "Android Devices To Message" }
+    Windows {Write-Log $listWindows.count "Total Windows Devices" -Level Information}
+    MacOS {Write-Log $listmac.count "Total MacOS Devices" -Level Information}
+    iOS {Write-Log $listios.Count  "Total iOS Devices" -Level Information}
+    Android {Write-Log $listandroid.Count  "Total Android Devices" -Level Information}
   
   }
  
@@ -204,7 +207,24 @@ if ($finalpage -eq 1)
   {
     Windows {
 
-           
+      foreach ($id in $listWindows)
+
+      {
+        try {$response = Invoke-WebRequest -Method Post -Uri "https://$wsoserver/api/mdm/devices/messages/push?searchby=deviceid&id=$id" -ContentType "application/json" -Header $header -Body $winbody}
+
+        catch {Write-Log "An error occurred when running script:  $_" -Level Error}
+
+
+        if ($response.statuscode -eq 202)
+
+        {
+
+          Write-Host "Message Sent Sucessfully to Windows Device ID $id"
+
+        }
+        
+        
+      }
 
             }
     MacOS {
