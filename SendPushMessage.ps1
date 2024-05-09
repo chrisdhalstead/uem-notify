@@ -192,22 +192,96 @@ Write-Log "$itotal $devicetype devices found" -Level Information
 
 $finalpage = [Math]::Ceiling($sresult.total / 10) 
 
-Write-Log "Final Page:  $finalpage" -Level Information
+Write-Log "Final Page:  $finalpage" -Level Verbose
 
 if ($finalpage -eq 1)
 
 {
 
-  switch ($devicetype)
+#Finished - do nothing 
+
+
+}
+
+else
+
+{
+ 
+  #page through results
+
+  $icount = 1
+
+ DO
+
+ {
+
+  $sresult = ""
+
+  $sresult = Invoke-RestMethod -Method Get -Uri "https://$wsoserver/api/mdm/devices/search?platform=$platform&page=$icount&pagesize=10" -ContentType "application/json" -Header $header
+
+  foreach ($deviceid in $sresult.devices.id.value)
+
+    {
+
+      switch ($devicetype)
+      {
+          Windows {$listWindows.add($deviceid)}
+          MacOS {$listmac.add($deviceid)}
+          iOS {$listios.add($deviceid)}
+          Android {$listandroid.add($deviceid) }
+      
+      }
+ 
+    }
+
+      # Increment the counter
+      $icount++
+
+  
+  }  until($icount-eq $finalpage)
+    
+  
+  }
+
+}
+
+
+#Prompt if want to send notification
+
+switch ($devicetype)
+  
   {
     Windows {Write-Log "Total Windows Devices: $($listWindows.Count)" -Level Information}
     MacOS {write-log "Total MacOS Devices: $($listmac.Count)" -Level Information}
     iOS {Write-Log "Total iOS Devices: $($listios.Count)" -Level Information}
     Android {Write-Log "Total Android Devices: $($listandroid.Count)" -Level Information}
-  
   }
- 
-  switch ($devicetype)
+
+$icountdevices = $listwindows.count + $listmac.count + $listios.count + $listandroid.count
+
+write-log $icountdevices
+
+$squestion = "Are you sure you want to send notifications to $icountdevices devices?"
+
+ # Clear-Host
+$answer = $Host.UI.PromptForChoice('Send Notifications?', $squestion, @('&Yes', '&No'), 1)
+
+if ($answer -eq 0) {
+    #yes
+    Write-Host 'Sending Notifications'
+}else{
+    
+    Write-Host 'Exiting'
+    
+    break
+}
+
+
+foreach ($device in $listdevices)
+
+{
+
+  switch ($device)
   {
     Windows {
 
@@ -256,10 +330,10 @@ if ($finalpage -eq 1)
     }
     
     iOS {  
-       foreach ($id in $listandroid)
+       foreach ($id in $listios)
 
       {
-        try {$response = Invoke-WebRequest -Method Post -Uri "https://$wsoserver/api/mdm/devices/messages/push?searchby=deviceid&id=$id" -ContentType "application/json" -Header $header -Body $androidbody}
+        try {$response = Invoke-WebRequest -Method Post -Uri "https://$wsoserver/api/mdm/devices/messages/push?searchby=deviceid&id=$id" -ContentType "application/json" -Header $header -Body $ios}
 
         catch {Write-Host "An error occurred when running script:  $_" }
 
@@ -302,105 +376,8 @@ if ($finalpage -eq 1)
 
 
     }
-  
+
   }
-
- 
-  continue
-
-
-}
-
- 
-  #page through results
-
-  $icount = 1
-
- DO
-
- {
-
-  $sresult = ""
-
-  $sresult = Invoke-RestMethod -Method Get -Uri "https://$wsoserver/api/mdm/devices/search?platform=$platform&page=$icount&pagesize=10" -ContentType "application/json" -Header $header
-
-  foreach ($deviceid in $sresult.devices.id.value)
-
-    {
-
-      switch ($devicetype)
-      {
-          Windows {$listWindows.add($deviceid)}
-          MacOS {$listmac.add($deviceid)}
-          iOS {$listios.add($deviceid)}
-          Android {$listandroid.add($deviceid) }
-      
-      }
- 
-    }
-
-      # Increment the counter
-      $icount++
-
-  
-  }  until($icount-eq $finalpage)
- 
-
-  switch ($devicetype)
-  
-  {
-    Windows {write-host $listWindows.count "Windows Devices To Message"}
-    MacOS {write-host $listmac.count "MacOS Devices To Message"}
-    iOS {write-host $listios.Count  "iOS Devices To Message"}
-    Android {write-host $listandroid.Count  "Android Devices To Message" }
-  }
-
-
-
-  switch ($devicetype)
-  {
-    Windows {
-
-      continue
-
-      foreach ($id in $listWindows)
-
-      {
-        try {$response = Invoke-WebRequest -Method Post -Uri "https://$wsoserver/api/mdm/devices/messages/push?searchby=deviceid&id=$id" -ContentType "application/json" -Header $header -Body $winbody}
-
-        catch {Write-Host "An error occurred when running script:  $_" }
-
-
-        if ($response.statuscode -eq 202)
-
-        {
-
-          Write-Host "Message Sent Sucessfully to Device ID $id"
-
-        }
-        
-        
-      }
-
-
-  }      
-            
-    MacOS {}
-    iOS {}
-    Android {
-        
-      foreach ($id in $listandroid)
-
-        {
-
-          $snotify = Invoke-RestMethod -Method Post -Uri "https://$wsoserver/api/mdm/devices/messages/push?searchby=deviceid&id=$id" -ContentType "application/json" -Header $header -Body $androidbody
-
-          write-host $snotify
-          
-        }
-
-
-    }
   
   }
 
@@ -414,16 +391,12 @@ if ($finalpage -eq 1)
 
 
 
-
-
-
-
   
 
 
   
 
-}
+
 
 
 
