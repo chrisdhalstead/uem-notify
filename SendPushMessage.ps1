@@ -283,8 +283,6 @@ foreach ($device in $listdevices)
 
 {
 
-  Write-Host $ilimit
-
   switch ($device)
   {
     Windows {
@@ -292,6 +290,17 @@ foreach ($device in $listdevices)
       foreach ($id in $listWindows)
 
       {
+
+        $ilimit++
+
+        if ($ilimit -eq 100)
+
+        {Write-Log "Pausing 15 seconds after 100 Decives" Verbose
+         
+        Start-Sleep -Seconds 15
+
+        $ilimit = 0 }
+
         try {$response = Invoke-WebRequest -Method Post -Uri "https://$wsoserver/api/mdm/devices/messages/push?searchby=deviceid&id=$id" -ContentType "application/json" -Header $header -Body $winbody}
 
         catch {Write-Log "An error occurred when running script:  $_" -Level Error}
@@ -315,6 +324,17 @@ foreach ($device in $listdevices)
       foreach ($id in $listmac)
 
       {
+
+        $ilimit++
+
+        if ($ilimit -eq 100)
+
+        {Write-Log "Pausing 15 seconds after 100 Decives" Verbose
+         
+        Start-Sleep -Seconds 15
+
+        $ilimit = 0 }
+
         try {$response = Invoke-WebRequest -Method Post -Uri "https://$wsoserver/api/mdm/devices/messages/push?searchby=deviceid&id=$id" -ContentType "application/json" -Header $header -Body $macosbody}
 
         catch {Write-Log "An error occurred when running script:  $_" -Level Error}
@@ -337,6 +357,17 @@ foreach ($device in $listdevices)
        foreach ($id in $listios)
 
       {
+
+        $ilimit++
+
+        if ($ilimit -eq 100)
+
+        {Write-Log "Pausing 15 seconds after 100 Decives" Verbose
+         
+        Start-Sleep -Seconds 15
+
+        $ilimit = 0 }
+
         try {$response = Invoke-WebRequest -Method Post -Uri "https://$wsoserver/api/mdm/devices/messages/push?searchby=deviceid&id=$id" -ContentType "application/json" -Header $header -Body $iosbody}
 
         catch {Write-Host "An error occurred when running script:  $_" }
@@ -350,11 +381,11 @@ foreach ($device in $listdevices)
 
         }
         
+       
         
       }
 
-
-      $ilimit++
+     
 
   }
 
@@ -364,6 +395,17 @@ foreach ($device in $listdevices)
       foreach ($id in $listandroid)
 
         {
+
+          $ilimit++
+
+          if ($ilimit -eq 100)
+  
+          {Write-Log "Pausing 15 seconds after 100 Decives" Verbose
+           
+          Start-Sleep -Seconds 15
+  
+          $ilimit = 0 }
+
           try {$response = Invoke-WebRequest -Method Post -Uri "https://$wsoserver/api/mdm/devices/messages/push?searchby=deviceid&id=$id" -ContentType "application/json" -Header $header -Body $androidbody}
 
           catch {Write-Host "An error occurred when running script:  $_" }
