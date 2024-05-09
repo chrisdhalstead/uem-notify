@@ -22,7 +22,7 @@ $winbody = "{`n  `"MessageBody`": `"TEST - Action Needed - Subscription Expirati
 $androidbody = "{`n  `"MessageBody`": `"TEST - Action Needed - Subscription Expiration: The Workspace ONE license on this device is expired. Contact your admin to avoid loss of access to your apps and data.`",`n  `"Application`": `"AirWatch Agent`",`n  `"MessageType`" : `"Push`"}"
 $iosbody = "{`n  `"MessageBody`": `"TEST - Action Needed - Subscription Expiration: The Workspace ONE license on this device is expired. Contact your admin to avoid loss of access to your apps and data.`",`n  `"Application`": `"IntelligentHub`",`n  `"MessageType`" : `"Apns`"}"
 $macosbody = "{`n  `"MessageBody`": `"TEST - Action Needed - Subscription Expiration: The Workspace ONE license on this device is expired. Contact your admin to avoid loss of access to your apps and data.`",`n  `"Application`": `"com.airwatch.mac.agent`",`n  `"MessageType`" : `"awcm`"}"
-
+$pagesize = "10"
 
 
 
@@ -147,7 +147,7 @@ write-log "Processing: $devicetype" -Level Information
 
 try {
     
-  $sresult = Invoke-RestMethod -Method Get -Uri "https://$wsoserver/api/mdm/devices/search?platform=$platform&page=0&pagesize=10" -ContentType "application/json" -Header $header
+  $sresult = Invoke-RestMethod -Method Get -Uri "https://$wsoserver/api/mdm/devices/search?platform=$platform&page=0&pagesize=$pagesize" -ContentType "application/json" -Header $header
 
 }
 
@@ -217,7 +217,7 @@ else
 
   $sresult = ""
 
-  $sresult = Invoke-RestMethod -Method Get -Uri "https://$wsoserver/api/mdm/devices/search?platform=$platform&page=$icount&pagesize=10" -ContentType "application/json" -Header $header
+  $sresult = Invoke-RestMethod -Method Get -Uri "https://$wsoserver/api/mdm/devices/search?platform=$platform&page=$icount&pagesize=$pagesize" -ContentType "application/json" -Header $header
 
   foreach ($deviceid in $sresult.devices.id.value)
 
@@ -259,8 +259,6 @@ switch ($devicetype)
 
 $icountdevices = $listwindows.count + $listmac.count + $listios.count + $listandroid.count
 
-write-log $icountdevices
-
 $squestion = "Are you sure you want to send notifications to $icountdevices devices?"
 
  # Clear-Host
@@ -271,15 +269,21 @@ if ($answer -eq 0) {
     Write-Host 'Sending Notifications'
 }else{
     
-    Write-Host 'Exiting'
+  Write-Log "Script Execution Complete - No Notifications Sent" Information
     
     break
 }
 
 
+
+$ilimit = 1
+
+
 foreach ($device in $listdevices)
 
 {
+
+  Write-Host $ilimit
 
   switch ($device)
   {
@@ -333,7 +337,7 @@ foreach ($device in $listdevices)
        foreach ($id in $listios)
 
       {
-        try {$response = Invoke-WebRequest -Method Post -Uri "https://$wsoserver/api/mdm/devices/messages/push?searchby=deviceid&id=$id" -ContentType "application/json" -Header $header -Body $ios}
+        try {$response = Invoke-WebRequest -Method Post -Uri "https://$wsoserver/api/mdm/devices/messages/push?searchby=deviceid&id=$id" -ContentType "application/json" -Header $header -Body $iosbody}
 
         catch {Write-Host "An error occurred when running script:  $_" }
 
@@ -349,6 +353,8 @@ foreach ($device in $listdevices)
         
       }
 
+
+      $ilimit++
 
   }
 
@@ -381,29 +387,7 @@ foreach ($device in $listdevices)
   
   }
 
-
-
-
-
-
-
-
-
-
-
-  
-
-
-  
-
-
-
-
-
-
-
-
-
+Write-Log "Script Execution Complete" Information
 
 }
 
