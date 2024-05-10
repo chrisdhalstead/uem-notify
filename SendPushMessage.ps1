@@ -18,10 +18,10 @@ $listios = New-Object Collections.Generic.List[Int]
 $listmac = New-Object Collections.Generic.List[Int]
 $listandroid = New-Object Collections.Generic.List[Int]
 $listdevices = New-Object Collections.Generic.List[string]
-$winbody = "{`n  `"MessageBody`": `"TEST - Action Needed - Subscription Expiration: The Workspace ONE license on this device is expired. Contact your admin to avoid loss of access to your apps and data.`",`n  `"Application`": `"com.airwatch.workspace.one`",`n  `"MessageType`" : `"wns`"}"
-$androidbody = "{`n  `"MessageBody`": `"TEST - Action Needed - Subscription Expiration: The Workspace ONE license on this device is expired. Contact your admin to avoid loss of access to your apps and data.`",`n  `"Application`": `"AirWatch Agent`",`n  `"MessageType`" : `"Push`"}"
-$iosbody = "{`n  `"MessageBody`": `"TEST - Action Needed - Subscription Expiration: The Workspace ONE license on this device is expired. Contact your admin to avoid loss of access to your apps and data.`",`n  `"Application`": `"IntelligentHub`",`n  `"MessageType`" : `"Apns`"}"
-$macosbody = "{`n  `"MessageBody`": `"TEST - Action Needed - Subscription Expiration: The Workspace ONE license on this device is expired. Contact your admin to avoid loss of access to your apps and data.`",`n  `"Application`": `"com.airwatch.mac.agent`",`n  `"MessageType`" : `"awcm`"}"
+$winbody = "{`n  `"MessageBody`": `"Action Needed - Subscription Expiration: The Workspace ONE license on this device is expired. Contact your admin to avoid loss of access to your apps and data.`",`n  `"Application`": `"com.airwatch.workspace.one`",`n  `"MessageType`" : `"wns`"}"
+$androidbody = "{`n  `"MessageBody`": `"Action Needed - Subscription Expiration: The Workspace ONE license on this device is expired. Contact your admin to avoid loss of access to your apps and data.`",`n  `"Application`": `"AirWatch Agent`",`n  `"MessageType`" : `"Push`"}"
+$iosbody = "{`n  `"MessageBody`": `"Action Needed - Subscription Expiration: The Workspace ONE license on this device is expired. Contact your admin to avoid loss of access to your apps and data.`",`n  `"Application`": `"IntelligentHub`",`n  `"MessageType`" : `"Apns`"}"
+$macosbody = "{`n  `"MessageBody`": `"Action Needed - Subscription Expiration: The Workspace ONE license on this device is expired. Contact your admin to avoid loss of access to your apps and data.`",`n  `"Application`": `"com.airwatch.mac.agent`",`n  `"MessageType`" : `"awcm`"}"
 $pagesize = "10"
 
 
