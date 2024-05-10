@@ -13,15 +13,16 @@ Send Push Notifications to all Devices in a UEM Tenant
 #----------------------------------------------------------[Declarations]----------------------------------------------------------
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 #Define Variables
+$messagetosend = "Action Needed - Subscription Expiration: The Workspace ONE license on this device is expired. Contact your admin to avoid loss of access to your apps and data."
 $listWindows = New-Object Collections.Generic.List[Int]
 $listios = New-Object Collections.Generic.List[Int]
 $listmac = New-Object Collections.Generic.List[Int]
 $listandroid = New-Object Collections.Generic.List[Int]
 $listdevices = New-Object Collections.Generic.List[string]
-$winbody = "{`n  `"MessageBody`": `"Action Needed - Subscription Expiration: The Workspace ONE license on this device is expired. Contact your admin to avoid loss of access to your apps and data.`",`n  `"Application`": `"com.airwatch.workspace.one`",`n  `"MessageType`" : `"wns`"}"
-$androidbody = "{`n  `"MessageBody`": `"Action Needed - Subscription Expiration: The Workspace ONE license on this device is expired. Contact your admin to avoid loss of access to your apps and data.`",`n  `"Application`": `"AirWatch Agent`",`n  `"MessageType`" : `"Push`"}"
-$iosbody = "{`n  `"MessageBody`": `"Action Needed - Subscription Expiration: The Workspace ONE license on this device is expired. Contact your admin to avoid loss of access to your apps and data.`",`n  `"Application`": `"IntelligentHub`",`n  `"MessageType`" : `"Apns`"}"
-$macosbody = "{`n  `"MessageBody`": `"Action Needed - Subscription Expiration: The Workspace ONE license on this device is expired. Contact your admin to avoid loss of access to your apps and data.`",`n  `"Application`": `"com.airwatch.mac.agent`",`n  `"MessageType`" : `"awcm`"}"
+$winbody = "{`n  `"MessageBody`":  `"$($messagetosend)`",`n  `"Application`": `"com.airwatch.workspace.one`",`n  `"MessageType`" : `"wns`"}"
+$androidbody = "{`n  `"MessageBody`":`"$($messagetosend)`",`n  `"Application`": `"AirWatch Agent`",`n  `"MessageType`" : `"Push`"}"
+$iosbody = "{`n  `"MessageBody`": `"$($messagetosend)`",`n  `"Application`": `"IntelligentHub`",`n  `"MessageType`" : `"Apns`"}"
+$macosbody = "{`n  `"MessageBody`": `"$($messagetosend)`",`n  `"Application`": `"com.airwatch.mac.agent`",`n  `"MessageType`" : `"awcm`"}"
 $pagesize = "10"
 
 
@@ -120,6 +121,7 @@ if ([string]::IsNullOrEmpty($wsoserver))
   Write-Log "Starting Script" -Level Information
   Write-Log "Log file $script:path$script:logfilename" -Level Information
   Write-Log "Searching $wsoserver" -Level Information
+  Write-Log "Message to be pushed to the Devices: $messagetosend" -Level Information
 
 
   $listdevices.add("Android")
@@ -303,7 +305,7 @@ foreach ($device in $listdevices)
 
         try {$response = Invoke-WebRequest -Method Post -Uri "https://$wsoserver/api/mdm/devices/messages/push?searchby=deviceid&id=$id" -ContentType "application/json" -Header $header -Body $winbody}
 
-        catch {Write-Log "An error occurred when running script:  $_" -Level Error}
+        catch {{Write-Log "An error occurred when sendinng push notification to Windows Device ID $id :  $_" -Level Error }}
 
 
         if ($response.statuscode -eq 202)
@@ -337,7 +339,7 @@ foreach ($device in $listdevices)
 
         try {$response = Invoke-WebRequest -Method Post -Uri "https://$wsoserver/api/mdm/devices/messages/push?searchby=deviceid&id=$id" -ContentType "application/json" -Header $header -Body $macosbody}
 
-        catch {Write-Log "An error occurred when running script:  $_" -Level Error}
+        catch {Write-Log "An error occurred when sendinng push notification to MacOS Device ID $id :  $_" -Level Error }
 
 
         if ($response.statuscode -eq 202)
@@ -370,14 +372,14 @@ foreach ($device in $listdevices)
 
         try {$response = Invoke-WebRequest -Method Post -Uri "https://$wsoserver/api/mdm/devices/messages/push?searchby=deviceid&id=$id" -ContentType "application/json" -Header $header -Body $iosbody}
 
-        catch {Write-Host "An error occurred when running script:  $_" }
+        catch {Write-Log "An error occurred when sendinng push notification to iOS Device ID $id :  $_" -Level Error }
 
 
         if ($response.statuscode -eq 202)
 
         {
 
-          Write-Host "Message Sent Sucessfully to Device ID $id"
+          Write-log "Message Sent Sucessfully to iOS Device ID $id" -Level Information
 
         }
         
@@ -408,8 +410,7 @@ foreach ($device in $listdevices)
 
           try {$response = Invoke-WebRequest -Method Post -Uri "https://$wsoserver/api/mdm/devices/messages/push?searchby=deviceid&id=$id" -ContentType "application/json" -Header $header -Body $androidbody}
 
-          catch {Write-Host "An error occurred when running script:  $_" }
-
+          catch {Write-Log "An error occurred when sendinng push notification to Android Device ID $id :  $_" -Level Error }
 
           if ($response.statuscode -eq 202)
 
