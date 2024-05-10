@@ -1,11 +1,11 @@
 <#
 .SYNOPSIS
-Sample script for VMware Workspace ONE UEM REST API
+Send Push Notifications to all Devices in a UEM Tenant
 
 .NOTES
   Version:        1.0
   Author:         Chris Halstead - chalstead@vmware.com
-  Creation Date:  8/21/2019
+  Creation Date:  5/10/2024
   Purpose/Change: Initial script development
   
 #>
