@@ -293,11 +293,11 @@ foreach ($device in $listdevices)
 
         $ilimit++
 
-        if ($ilimit -eq 100)
+        if ($ilimit -eq 150)
 
-        {Write-Log "Pausing 15 seconds after 100 Decives" Verbose
+        {Write-Log "Pausing 5 seconds after 150 Devices" Verbose
          
-        Start-Sleep -Seconds 15
+        Start-Sleep -Seconds 5
 
         $ilimit = 0 }
 
@@ -327,11 +327,11 @@ foreach ($device in $listdevices)
 
         $ilimit++
 
-        if ($ilimit -eq 100)
+        if ($ilimit -eq 150)
 
-        {Write-Log "Pausing 15 seconds after 100 Decives" Verbose
+        {Write-Log "Pausing 5 seconds after 150 Devices" Verbose
          
-        Start-Sleep -Seconds 15
+        Start-Sleep -Seconds 5
 
         $ilimit = 0 }
 
@@ -360,11 +360,11 @@ foreach ($device in $listdevices)
 
         $ilimit++
 
-        if ($ilimit -eq 100)
+        if ($ilimit -eq 150)
 
-        {Write-Log "Pausing 15 seconds after 100 Decives" Verbose
+        {Write-Log "Pausing 5 seconds after 150 Devices" Verbose
          
-        Start-Sleep -Seconds 15
+        Start-Sleep -Seconds 5
 
         $ilimit = 0 }
 
@@ -398,11 +398,11 @@ foreach ($device in $listdevices)
 
           $ilimit++
 
-          if ($ilimit -eq 100)
+          if ($ilimit -eq 150)
   
-          {Write-Log "Pausing 15 seconds after 100 Decives" Verbose
+          {Write-Log "Pausing 5 seconds after 150 Devices" Verbose
            
-          Start-Sleep -Seconds 15
+          Start-Sleep -Seconds 5
   
           $ilimit = 0 }
 
