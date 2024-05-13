@@ -92,16 +92,12 @@ Function Write-Log {
 Function SearchandMessageDevices() {
 
 
-if ([string]::IsNullOrEmpty($wsoserver))
-  {
-    $script:WSOServer = Read-Host -Prompt 'Enter the Workspace ONE UEM API Server Name'
-  
-  }
- if ([string]::IsNullOrEmpty($header))
-  {
+    $WSOServer = Read-Host -Prompt 'Enter the Workspace ONE UEM API Server Name'
+    $oguuid = Read-Host -Prompt 'Enter the UUID of the OG to search'
     $Username = Read-Host -Prompt 'Enter the Username'
     $Password = Read-Host -Prompt 'Enter the Password' -AsSecureString
     $apikey = Read-Host -Prompt 'Enter the API Key'
+    
     #Convert the Password
     $BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($Password)
     $UnsecurePassword = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
@@ -111,18 +107,32 @@ if ([string]::IsNullOrEmpty($wsoserver))
     $encoding = [System.Text.Encoding]::ASCII.GetBytes($combined)
     $cred = [Convert]::ToBase64String($encoding)
 
-    $script:header = @{
+    $header = @{
     "Authorization"  = "Basic $cred";
     "aw-tenant-code" = $apikey;
-    "Accept"		 = "application/json;version=2";
-    "Content-Type"   = "application/json";}
-  }
+    "Accept"		 = "application/json;version=3";
+    "Content-Type"   = "application/json;version=3";}
 
   Write-Log "Starting Script" -Level Information
   Write-Log "Log file $script:path$script:logfilename" -Level Information
   Write-Log "Searching $wsoserver" -Level Information
   Write-Log "Message to be pushed to the Devices: $messagetosend" -Level Information
 
+  try {
+    
+    $sog = Invoke-RestMethod -Method Get -Uri "https://$wsoserver/API/system/groups/$oguuid" -ContentType "application/json" -Header $header
+  
+  }
+  
+  catch {
+    Write-Log "An error occurred when searching OGs:  $_" -Level "Warning"
+    exit
+  
+  }
+
+  $ogfn = $sog.name
+
+  Write-Log "Selected Organization Group: $ogfn" Information
 
   $listdevices.add("Android")
   $listdevices.add("Windows")
@@ -149,13 +159,14 @@ write-log "Processing: $devicetype" -Level Information
 
 try {
     
-  $sresult = Invoke-RestMethod -Method Get -Uri "https://$wsoserver/api/mdm/devices/search?platform=$platform&page=0&pagesize=$pagesize" -ContentType "application/json" -Header $header
+  $sresult = Invoke-RestMethod -Method Get -Uri "https://$wsoserver/api/mdm/devices/search?organization_group_uuid=$oguuid&device_type=$platform&page=0&pagesize=$pagesize" -ContentType "application/json" -Header $header
 
 }
 
 catch {
   Write-Log "An error occurred when searching devices:  $_" -Level "Warning"
-  break
+  exit
+
 }
 
 
@@ -167,6 +178,8 @@ if ($sresult -eq "")
   continue
 
 }
+
+Write-Log "OG Name: $ogfn"
 
 foreach ($deviceid in $sresult.devices.id.value)
 
@@ -261,7 +274,7 @@ switch ($devicetype)
 
 $icountdevices = $listwindows.count + $listmac.count + $listios.count + $listandroid.count
 
-$squestion = "Are you sure you want to send notifications to $icountdevices devices?"
+$squestion = "Are you sure you want to send notifications to $icountdevices devices in the $ogfn OG on $wsoserver ?"
 
  # Clear-Host
 $answer = $Host.UI.PromptForChoice('Send Notifications?', $squestion, @('&Yes', '&No'), 1)
