@@ -281,7 +281,7 @@ if ($icountdevices -eq 0)
  break
 }
 
-$squestion = "Are you sure you want to send notifications to $icountdevices devices in the $ogfn OG on $wsoserver ?"
+$squestion = "Are you sure you want to send notifications to $icountdevices devices in the $ogfn OG (and Sub OGs) on $wsoserver ?"
 
  # Clear-Host
 $answer = $Host.UI.PromptForChoice('Send Notifications?', $squestion, @('&Yes', '&No'), 1)
