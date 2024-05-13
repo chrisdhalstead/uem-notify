@@ -117,11 +117,6 @@ Function Write-Log {
 
 Function SearchandMessageDevices() {
 
-    
-  #Convert the Password
-  #$BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($encryptedcreds)
-  #$cred = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
-
   $header = @{
   "Authorization"  = "Basic $creds";
   "aw-tenant-code" = $apikey;
