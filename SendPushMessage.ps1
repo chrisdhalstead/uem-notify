@@ -274,6 +274,13 @@ switch ($devicetype)
 
 $icountdevices = $listwindows.count + $listmac.count + $listios.count + $listandroid.count
 
+if ($icountdevices -eq 0)
+
+{
+ Write-Log "No devices found - Exiting"
+ break
+}
+
 $squestion = "Are you sure you want to send notifications to $icountdevices devices in the $ogfn OG on $wsoserver ?"
 
  # Clear-Host
