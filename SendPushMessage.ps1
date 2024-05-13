@@ -23,7 +23,7 @@ $winbody = "{`n  `"MessageBody`":  `"$($messagetosend)`",`n  `"Application`": `"
 $androidbody = "{`n  `"MessageBody`":`"$($messagetosend)`",`n  `"Application`": `"AirWatch Agent`",`n  `"MessageType`" : `"Push`"}"
 $iosbody = "{`n  `"MessageBody`": `"$($messagetosend)`",`n  `"Application`": `"IntelligentHub`",`n  `"MessageType`" : `"Apns`"}"
 $macosbody = "{`n  `"MessageBody`": `"$($messagetosend)`",`n  `"Application`": `"com.airwatch.mac.agent`",`n  `"MessageType`" : `"awcm`"}"
-$pagesize = "10"
+$pagesize = "500"
 
 
 
@@ -192,7 +192,7 @@ $itotal = $sresult.Total
 
 Write-Log "$itotal $devicetype devices found" -Level Information
 
-$finalpage = [Math]::Ceiling($sresult.total / 10) 
+$finalpage = [Math]::Ceiling($sresult.total / $pagesize) 
 
 Write-Log "Final Page:  $finalpage" -Level Verbose
 
