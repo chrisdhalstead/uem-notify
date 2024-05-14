@@ -55,9 +55,6 @@ $androidbody = "{`n  `"MessageBody`":`"$($messagetosend)`",`n  `"Application`": 
 $iosbody = "{`n  `"MessageBody`": `"$($messagetosend)`",`n  `"Application`": `"IntelligentHub`",`n  `"MessageType`" : `"Apns`"}"
 $macosbody = "{`n  `"MessageBody`": `"$($messagetosend)`",`n  `"Application`": `"com.airwatch.mac.agent`",`n  `"MessageType`" : `"awcm`"}"
 $pagesize = "500"
-
-
-
 #-----------------------------------------------------------[Functions]------------------------------------------------------------
 
 Function Write-Log {
