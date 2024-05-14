@@ -1,13 +1,19 @@
 <#
 .SYNOPSIS
-Send Push Notifications to all Devices in a UEM OG
+Send Push Notifications to all Devices in a UEM OG - Silently (no prompts)
+
+Usage: 
+
+sendpushmessagesilent.ps1 -wsoserver <UEM API Server> -oguuid <UUID of the OG you want to notify - Sub OGs will be notified as well>
+-creds <base64 encoded UEM username:password> -apikey <UEM REST API Key>
 
 .NOTES
   Version:        1.0
   Author:         Chris Halstead - chalstead@vmware.com
   Creation Date:  5/10/2024
   Purpose/Change: Initial script development
-  
+
+    
 #>
 [CmdletBinding()]
 
@@ -28,7 +34,6 @@ Param (
     Position=3)]
     [ValidateNotNullorEmpty()]
     [String]$creds,
-
     [Parameter(
     ValueFromPipeline=$true,
     Position=4)]
